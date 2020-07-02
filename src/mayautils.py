@@ -46,7 +46,7 @@ class SceneFile(object):
 
     def basename(self):
         """Returns the DCC scene file's name"""
-        name_pattern = "{descriptor}_{version:03d}.{ext}"
+        name_pattern = "{descriptor}_v{version:03d}.{ext}"
         name = name_pattern.format(descriptor=self.descriptor,
                                     version=self.version,
                                     ext=self.ext)
@@ -74,4 +74,26 @@ class SceneFile(object):
             pmc.system.saveAs(self.path())
 
     def increment_and_save(self):
-        pass
+        files_list = self.dir.listdir()
+
+        scene_list = list()
+        for file in files_list:
+            file_path = Path(file)
+            scene = file_path.name
+            scene_list.append(scene)
+
+        greatest_version = self.version
+
+        for scene in scene_list:
+            descriptor = scene.split("_v")[0]
+
+            if descriptor == self.descriptor:
+                version_str = scene.split("_v")[1].split(".")[0]
+                version = int(version_str)
+
+                if version > self.version:
+                    greatest_version = version
+
+        self.version = greatest_version + 1
+
+        self.save()
