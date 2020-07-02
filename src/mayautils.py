@@ -1,7 +1,10 @@
 import logging
+import os
+import maya.cmds as cmds
 
 import pymel.core as pmc
 from pymel.core.system import Path
+from pymel.core.system import versions
 
 log = logging.getLogger(__name__)
 
@@ -16,10 +19,22 @@ class SceneFile(object):
     """
 
     def __init__(self, dir='', descriptor='main', version=1, ext="ma"):
-        self._dir = Path(dir)
-        self.descriptor = descriptor
-        self.version = version
-        self.ext = ext
+        if pmc.system.isModified():
+            self._dir = Path(dir)
+            self.descriptor = descriptor
+            self.version = version
+            self.ext = ext
+        else:
+            temp_path = Path(pmc.system.sceneName())
+            self.dir = temp_path.parent
+
+            file_name = temp_path.name
+            self.descriptor = file_name.split("_v")[0]
+
+            version = file_name.split("_v")[1].split(".")[0]
+            self.version = int(version)
+
+            self.ext = file_name.split(".")[1]
 
     @property
     def dir(self):
