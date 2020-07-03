@@ -19,6 +19,7 @@ class SceneFile(object):
     """
 
     def __init__(self, dir='', descriptor='main', version=1, ext="ma"):
+        #Delineates between new scene vs open scene with naming conventions
         if pmc.system.isModified():
             self._dir = Path(dir)
             self.descriptor = descriptor
@@ -27,13 +28,10 @@ class SceneFile(object):
         else:
             temp_path = Path(pmc.system.sceneName())
             self.dir = temp_path.parent
-
             file_name = temp_path.name
             self.descriptor = file_name.split("_v")[0]
-
             version = file_name.split("_v")[1].split(".")[0]
             self.version = int(version)
-
             self.ext = file_name.split(".")[1]
 
     @property
@@ -75,14 +73,12 @@ class SceneFile(object):
 
     def increment_and_save(self):
         files_list = self.dir.listdir()
-
         scene_list = list()
         for file in files_list:
             file_path = Path(file)
             scene = file_path.name
             scene_list.append(scene)
-
-        greatest_version = self.version
+        highest_version = self.version
 
         for scene in scene_list:
             descriptor = scene.split("_v")[0]
@@ -92,8 +88,7 @@ class SceneFile(object):
                 version = int(version_str)
 
                 if version > self.version:
-                    greatest_version = version
+                    highest_version = version
 
-        self.version = greatest_version + 1
-
+        self.version = highest_version + 1
         self.save()
